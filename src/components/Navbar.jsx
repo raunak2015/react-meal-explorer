@@ -8,6 +8,7 @@ function Navbar() {
     const navItems = [
         { to: '/', icon: '🔍', label: 'Search', end: true },
         { to: '/categories', icon: '📂', label: 'Categories' },
+        { to: '/random', icon: '🎲', label: 'Random' },
         { to: '/liked', icon: '❤️', label: 'Liked', badge: likedCount },
     ]
 

@@ -12,6 +12,7 @@ function SearchMeals() {
     const [letterIndex, setLetterIndex] = useState(0)
     const [allLoaded, setAllLoaded] = useState(false)
     const [isSearchMode, setIsSearchMode] = useState(false)
+    const [activeLetter, setActiveLetter] = useState(null)
 
     // Sentinel div ref for IntersectionObserver
     const sentinelRef = useRef(null)
@@ -32,7 +33,7 @@ function SearchMeals() {
 
     // Load the next batch of meals (next letter)
     const loadMore = useCallback(async () => {
-        if (loadingMore || allLoaded || isSearchMode) return
+        if (loadingMore || allLoaded || isSearchMode || activeLetter) return
 
         setLoadingMore(true)
         setError(null)
@@ -59,7 +60,7 @@ function SearchMeals() {
         }
 
         setLoadingMore(false)
-    }, [loadingMore, allLoaded, isSearchMode, letterIndex])
+    }, [loadingMore, allLoaded, isSearchMode, activeLetter, letterIndex])
 
     // Initial load
     useEffect(() => {
@@ -76,7 +77,7 @@ function SearchMeals() {
 
     // Setup IntersectionObserver on sentinel
     useEffect(() => {
-        if (isSearchMode) return
+        if (isSearchMode || activeLetter) return
 
         const sentinel = sentinelRef.current
         if (!sentinel) return
@@ -95,7 +96,7 @@ function SearchMeals() {
         return () => {
             if (observerRef.current) observerRef.current.disconnect()
         }
-    }, [loadMore, isSearchMode])
+    }, [loadMore, isSearchMode, activeLetter])
 
     // Search by name
     const handleSearch = async (e) => {
@@ -103,20 +104,14 @@ function SearchMeals() {
         const query = searchTerm.trim()
 
         if (!query) {
-            // Reset to infinite scroll mode
-            setIsSearchMode(false)
-            setMeals([])
-            setLetterIndex(0)
-            setAllLoaded(false)
-            const initial = await fetchByLetter('a')
-            setMeals(initial)
-            setLetterIndex(1)
+            handleClear()
             return
         }
 
         setLoading(true)
         setError(null)
         setIsSearchMode(true)
+        setActiveLetter(null)
 
         try {
             const res = await fetch(
@@ -131,10 +126,31 @@ function SearchMeals() {
         }
     }
 
+    // Filter by letter
+    const handleLetterClick = async (letter) => {
+        if (activeLetter === letter) {
+            // Clicking same letter again → clear filter
+            handleClear()
+            return
+        }
+
+        setActiveLetter(letter)
+        setIsSearchMode(false)
+        setSearchTerm('')
+        setLoading(true)
+        setError(null)
+        setAllLoaded(false)
+
+        const results = await fetchByLetter(letter)
+        setMeals(results)
+        setLoading(false)
+    }
+
     // Clear search → go back to infinite scroll
     const handleClear = async () => {
         setSearchTerm('')
         setIsSearchMode(false)
+        setActiveLetter(null)
         setMeals([])
         setLetterIndex(0)
         setAllLoaded(false)
@@ -145,16 +161,19 @@ function SearchMeals() {
         setLoading(false)
     }
 
+    // Subtitle text
+    const getSubtitle = () => {
+        if (isSearchMode) return `Showing results for "${searchTerm}"`
+        if (activeLetter) return `Showing meals starting with "${activeLetter.toUpperCase()}"`
+        return 'Scroll down to discover more meals from around the world'
+    }
+
     return (
         <div>
             {/* Header */}
             <div className="page-header">
                 <h1>Explore <span className="highlight">Meals</span></h1>
-                <p>
-                    {isSearchMode
-                        ? `Showing results for "${searchTerm}"`
-                        : 'Scroll down to discover more meals from around the world'}
-                </p>
+                <p>{getSubtitle()}</p>
             </div>
 
             {/* Search Bar */}
@@ -168,7 +187,7 @@ function SearchMeals() {
                 <button type="submit" className="btn btn-primary">
                     🔍 Search
                 </button>
-                {isSearchMode && (
+                {(isSearchMode || activeLetter) && (
                     <button
                         type="button"
                         className="btn btn-secondary"
@@ -178,6 +197,19 @@ function SearchMeals() {
                     </button>
                 )}
             </form>
+
+            {/* Alphabet Filter Bar */}
+            <div className="alphabet-bar">
+                {LETTERS.map(letter => (
+                    <button
+                        key={letter}
+                        className={`alphabet-btn ${activeLetter === letter ? 'active' : ''}`}
+                        onClick={() => handleLetterClick(letter)}
+                    >
+                        {letter.toUpperCase()}
+                    </button>
+                ))}
+            </div>
 
             {/* Initial Loading */}
             {loading && (
@@ -195,12 +227,14 @@ function SearchMeals() {
                 </div>
             )}
 
-            {/* No Results (search mode) */}
+            {/* No Results */}
             {!loading && !error && meals.length === 0 && (
                 <div className="empty-state">
                     <div className="icon">🍽</div>
                     <h3>No meals found</h3>
-                    <p>Try a different search term</p>
+                    <p>{activeLetter
+                        ? `No meals start with "${activeLetter.toUpperCase()}"`
+                        : 'Try a different search term'}</p>
                 </div>
             )}
 
@@ -213,8 +247,8 @@ function SearchMeals() {
                         ))}
                     </div>
 
-                    {/* Infinite scroll sentinel */}
-                    {!isSearchMode && (
+                    {/* Infinite scroll sentinel (only in default browse mode) */}
+                    {!isSearchMode && !activeLetter && (
                         <div ref={sentinelRef} style={{ height: '1px', marginTop: '40px' }}>
                             {loadingMore && (
                                 <div className="loading-more-wrapper">
@@ -226,7 +260,7 @@ function SearchMeals() {
                     )}
 
                     {/* End of all meals */}
-                    {allLoaded && !isSearchMode && (
+                    {allLoaded && !isSearchMode && !activeLetter && (
                         <div className="all-loaded">
                             🎉 You've explored all meals in the database!
                         </div>

@@ -11,7 +11,9 @@ A feature-rich React application for exploring, searching, and saving meals from
 | Feature | Description |
 |---|---|
 | 🔍 **Search Meals** | Search meals by name using TheMealDB API |
-| 📜 **Infinite Scroll** | Auto-loads meals letter-by-letter (A→Z) as you scroll |
+| � **Filter by Letter** | A–Z alphabet bar to filter meals by first letter |
+| �📜 **Infinite Scroll** | Auto-loads meals letter-by-letter (A→Z) as you scroll |
+| 🎲 **Random Meal** | "Surprise Me" button fetches a random meal with spin animation |
 | 📂 **Categories** | Browse all meal categories with images & descriptions |
 | 🍴 **Category Meals** | View all meals in a selected category |
 | 📖 **Meal Details** | Full details — image, ingredients, instructions, YouTube link |
@@ -44,11 +46,12 @@ src/
 │   ├── Navbar.jsx          # Top navbar + mobile bottom tab bar
 │   └── MealCard.jsx        # Reusable meal card with like toggle
 ├── pages/
-│   ├── SearchMeals.jsx     # Home page — search + infinite scroll
+│   ├── SearchMeals.jsx     # Home page — search + alphabet filter + infinite scroll
 │   ├── MealDetails.jsx     # Meal detail view (/meal/:id)
 │   ├── Categories.jsx      # All categories (/categories)
 │   ├── CategoryMeals.jsx   # Meals by category (/category/:name)
-│   └── LikedMeals.jsx      # Liked meals page (/liked)
+│   ├── LikedMeals.jsx      # Liked meals page (/liked)
+│   └── RandomMeal.jsx      # Random meal generator (/random)
 ├── store/
 │   ├── store.js            # Redux store configuration
 │   └── likedSlice.js       # Liked meals slice (actions + selectors)
@@ -96,11 +99,12 @@ Output goes to the `dist/` folder.
 
 | Route | Page | Description |
 |---|---|---|
-| `/` | Search Meals | Default view — loads meals A→Z with infinite scroll |
+| `/` | Search Meals | Default view — search, alphabet filter, infinite scroll |
 | `/meal/:id` | Meal Details | Shows full info for a specific meal |
 | `/categories` | Categories | Grid of all meal categories |
 | `/category/:name` | Category Meals | All meals under a specific category |
 | `/liked` | Liked Meals | Shows all user-liked meals |
+| `/random` | Random Meal | "Surprise Me" random meal generator |
 
 ---
 
@@ -113,6 +117,7 @@ Output goes to the `dist/` folder.
 | `lookup.php?i=ID` | Get full meal details by ID |
 | `categories.php` | Get all meal categories |
 | `filter.php?c=CATEGORY` | Get meals by category |
+| `random.php` | Get a random meal |
 
 Base URL: `https://www.themealdb.com/api/json/v1/1/`
 
@@ -151,9 +156,10 @@ User clicks Like → dispatch(toggleLike(id)) → Redux updates state → localS
 ## 📱 Mobile UX
 
 On screens ≤480px:
-- **Bottom tab bar** replaces top navbar links (Search / Categories / Liked)
+- **Bottom tab bar** replaces top navbar links (Search / Categories / Random / Liked)
 - **Horizontal meal cards** — thumbnail left, content right
 - **Pill-shaped search bar** with integrated button
+- **Compact alphabet bar** with smaller letter buttons
 - Content padded to clear the tab bar
 
 ---
@@ -162,10 +168,10 @@ On screens ≤480px:
 
 | Hook | Usage |
 |---|---|
-| `useState` | Meals, loading, error, search term, etc. |
+| `useState` | Meals, loading, error, search term, active letter, etc. |
 | `useEffect` | API calls, IntersectionObserver setup |
 | `useParams` | Dynamic route params (`:id`, `:name`) |
-| `useNavigate` | Programmatic navigation from MealCard |
+| `useNavigate` | Programmatic navigation from MealCard & RandomMeal |
 | `useSelector` | Read Redux state (liked IDs, count) |
 | `useDispatch` | Dispatch Redux actions (toggleLike, removeLike) |
 | `useRef` | IntersectionObserver sentinel element |
