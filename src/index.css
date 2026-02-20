@@ -749,30 +749,275 @@ body::after {
 /* ==================
    Responsive
    ================== */
+
+/* --- Tablet Landscape (≤1024px) --- */
+@media (max-width: 1024px) {
+  .main-content {
+    max-width: 100%;
+    padding: 85px 24px 36px;
+  }
+
+  .meal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .meal-details-img {
+    width: 300px;
+    height: 240px;
+  }
+}
+
+/* --- Tablet Portrait (≤768px) --- */
 @media (max-width: 768px) {
+
+  /* Navbar */
   .navbar {
     padding: 0 16px;
+    height: 60px;
   }
 
   .navbar-brand {
     font-size: 1.1rem;
   }
 
+  .navbar-links {
+    gap: 2px;
+  }
+
   .navbar-links a {
     padding: 6px 10px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    gap: 4px;
   }
 
+  /* Hide link text, show only emoji on small screens */
+  .navbar-links a span:not(.liked-badge) {
+    display: none;
+  }
+
+  /* Main content */
   .main-content {
-    padding: 80px 16px 32px;
+    padding: 76px 16px 32px;
   }
 
+  /* Page header */
+  .page-header h1 {
+    font-size: 1.7rem;
+  }
+
+  /* Search bar */
+  .search-bar {
+    flex-wrap: wrap;
+    max-width: 100%;
+    gap: 8px;
+  }
+
+  .search-bar input {
+    min-width: 0;
+    font-size: 0.9rem;
+  }
+
+  .search-bar .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Meal grid */
+  .meal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  /* Categories grid */
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  /* Meal details */
   .meal-details-header {
     flex-direction: column;
+    gap: 20px;
   }
 
   .meal-details-img {
     width: 100%;
     height: 240px;
+  }
+
+  .meal-details-info h1 {
+    font-size: 1.4rem;
+  }
+
+  .instructions-text {
+    padding: 16px;
+    font-size: 0.88rem;
+  }
+}
+
+/* --- Large Mobile (≤480px) --- */
+@media (max-width: 480px) {
+
+  /* Navbar */
+  .navbar {
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .navbar-links a {
+    padding: 6px 8px;
+    font-size: 1rem;
+    /* emoji only */
+  }
+
+  /* Main content */
+  .main-content {
+    padding: 68px 12px 28px;
+  }
+
+  /* Page header */
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .page-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .page-header p {
+    font-size: 0.85rem;
+  }
+
+  /* Search bar */
+  .search-bar {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 12px 14px;
+  }
+
+  .search-bar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Meal grid → 1 column */
+  .meal-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .meal-card-img {
+    height: 180px;
+  }
+
+  /* Categories grid → 2 columns */
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .category-img {
+    height: 120px;
+  }
+
+  .category-body {
+    padding: 12px;
+  }
+
+  .category-name {
+    font-size: 0.88rem;
+  }
+
+  /* Meal details */
+  .meal-details-img {
+    height: 200px;
+    border-radius: 14px;
+  }
+
+  .meal-details-info h1 {
+    font-size: 1.25rem;
+  }
+
+  .meal-meta-tag {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* Back button */
+  .back-btn {
+    font-size: 0.82rem;
+    padding: 7px 12px;
+    margin-bottom: 20px;
+  }
+
+  /* Ingredients */
+  .ingredient-chip {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+  }
+
+  /* Instructions */
+  .instructions-text {
+    padding: 14px;
+    font-size: 0.85rem;
+    line-height: 1.75;
+  }
+
+  /* Loading / empty states */
+  .empty-state {
+    padding: 50px 16px;
+  }
+
+  .empty-state .icon {
+    font-size: 2.8rem;
+  }
+
+  .all-loaded {
+    padding: 24px 16px;
+    font-size: 0.88rem;
+  }
+}
+
+/* --- Small Mobile (≤360px) --- */
+@media (max-width: 360px) {
+  .navbar-brand {
+    font-size: 0.9rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .meal-card-body {
+    padding: 12px;
+  }
+
+  .meal-card-title {
+    font-size: 0.9rem;
   }
 }
