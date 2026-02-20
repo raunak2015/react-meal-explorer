@@ -1,15 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import { getLikedIds } from '../utils/likedUtils'
+import { selectLikedCount } from '../store/likedSlice'
 
 function Navbar() {
-    const [likedCount, setLikedCount] = useState(getLikedIds().length)
-
-    useEffect(() => {
-        const update = () => setLikedCount(getLikedIds().length)
-        window.addEventListener('likedUpdated', update)
-        return () => window.removeEventListener('likedUpdated', update)
-    }, [])
+    const likedCount = useSelector(selectLikedCount)
 
     const navItems = [
         { to: '/', icon: '🔍', label: 'Search', end: true },

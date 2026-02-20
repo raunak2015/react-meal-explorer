@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { isLiked, toggleLike } from '../utils/likedUtils'
+import { toggleLike, selectIsLiked } from '../store/likedSlice'
 
 function MealCard({ meal }) {
-    const [liked, setLiked] = useState(() => isLiked(meal.idMeal))
+    const dispatch = useDispatch()
+    const liked = useSelector(selectIsLiked(meal.idMeal))
     const navigate = useNavigate()
 
     const handleLike = () => {
-        toggleLike(meal.idMeal)
-        setLiked(prev => !prev)
+        dispatch(toggleLike(meal.idMeal))
     }
 
     return (

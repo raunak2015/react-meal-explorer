@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { isLiked, toggleLike } from '../utils/likedUtils'
+import { useSelector, useDispatch } from 'react-redux'
+import { toggleLike, selectIsLiked } from '../store/likedSlice'
 
 function MealDetails() {
     const { id } = useParams()
+    const dispatch = useDispatch()
+    const liked = useSelector(selectIsLiked(id))
     const [meal, setMeal] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [liked, setLiked] = useState(false)
 
     useEffect(() => {
         const fetchMeal = async () => {
@@ -20,7 +22,6 @@ function MealDetails() {
                 const data = await res.json()
                 if (data.meals && data.meals.length > 0) {
                     setMeal(data.meals[0])
-                    setLiked(isLiked(data.meals[0].idMeal))
                 } else {
                     setError('Meal not found.')
                 }
@@ -35,8 +36,7 @@ function MealDetails() {
     }, [id])
 
     const handleLike = () => {
-        toggleLike(meal.idMeal)
-        setLiked(prev => !prev)
+        dispatch(toggleLike(meal.idMeal))
     }
 
     // Extract ingredients from meal object

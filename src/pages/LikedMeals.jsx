@@ -1,46 +1,47 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getLikedIds, toggleLike } from '../utils/likedUtils'
+import { useSelector, useDispatch } from 'react-redux'
+import { removeLike, selectLikedIds } from '../store/likedSlice'
 
 function LikedMeals() {
+    const likedIds = useSelector(selectLikedIds)
+    const dispatch = useDispatch()
     const [meals, setMeals] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const fetchLikedMeals = async () => {
-        const ids = getLikedIds()
-
-        if (ids.length === 0) {
-            setMeals([])
-            setLoading(false)
-            return
-        }
-
-        setLoading(true)
-        setError(null)
-
-        try {
-            const results = await Promise.all(
-                ids.map(id =>
-                    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
-                        .then(res => res.json())
-                        .then(data => (data.meals ? data.meals[0] : null))
-                )
-            )
-            setMeals(results.filter(Boolean))
-        } catch {
-            setError('Failed to load liked meals.')
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+        const fetchLikedMeals = async () => {
+            if (likedIds.length === 0) {
+                setMeals([])
+                setLoading(false)
+                return
+            }
+
+            setLoading(true)
+            setError(null)
+
+            try {
+                const results = await Promise.all(
+                    likedIds.map(id =>
+                        fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+                            .then(res => res.json())
+                            .then(data => (data.meals ? data.meals[0] : null))
+                    )
+                )
+                setMeals(results.filter(Boolean))
+            } catch {
+                setError('Failed to load liked meals.')
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fetchLikedMeals()
-    }, [])
+    }, [likedIds])
 
     const handleRemove = (id) => {
-        toggleLike(id) // removes since it's currently liked
+        dispatch(removeLike(id))
         setMeals(prev => prev.filter(m => m.idMeal !== String(id)))
     }
 
